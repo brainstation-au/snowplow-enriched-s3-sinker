@@ -7,18 +7,18 @@ with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
 setup(
-    name="py-project",
+    name="snowplow-enriched-s3-sinker",
     version="0.0.1",
     author="Khalid Saifullah",
     author_email="khalid@outlook.com.au",
-    description="A small example package",
+    description="Transform snowplow enriched tsv records to json and dump them in S3 via firehose",
     entry_points={},
     install_requires=requirements,
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/ksaifullah/sampleproject",
+    url="https://github.com/brainstation-au/snowplow-enriched-s3-sinker",
     project_urls={
-        "Bug Tracker": "https://github.com/ksaifullah/sampleproject/issues",
+        "Bug Tracker": "https://github.com/brainstation-au/snowplow-enriched-s3-sinker/issues",
     },
     classifiers=[
         "Programming Language :: Python :: 3",
