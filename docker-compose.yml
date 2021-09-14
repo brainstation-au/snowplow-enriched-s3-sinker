@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  sh: &base
+    build:
+      context: .
+      target: test
+    working_dir: /opt/code
+    volumes:
+      - .:/opt/code
+    command: bash
+
+  test:
+    <<: *base
+    command: bash -c "pip install -e . && pytest"
+
+  picked:
+    <<: *base
+    command: bash -c "pip install -e . && pytest --picked"
+
+  package:
+    <<: *base
+    build:
+      context: .
+      target: prod
+    command: >
+      bash -c "pip install --target /tmp/lambda -r requirements.txt
+      && cp -r src/* /tmp/lambda/
+      && cd /tmp/lambda
+      && zip -r /opt/code/package.zip ."

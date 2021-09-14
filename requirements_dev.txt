@@ -1,0 +1,8 @@
+-r requirements.txt
+mypy==0.812
+pylint==2.8.3
+pytest==6.2.4
+pytest-cov==2.12.1
+pytest-picked==0.4.6
+pytest-sugar==0.9.4
+pytest-xdist==2.2.1

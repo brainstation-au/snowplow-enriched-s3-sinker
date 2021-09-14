@@ -1,0 +1,6 @@
+{
+  "python.pythonPath": "/opt/homebrew/Caskroom/miniconda/base/envs/snowplow/bin/python",
+  "editor.tabSize": 4,
+  "python.linting.pylintEnabled": true,
+  "python.terminal.activateEnvironment": false
+}
