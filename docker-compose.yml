@@ -23,7 +23,5 @@ services:
       context: .
       target: prod
     command: >
-      bash -c "pip install --target /tmp/lambda -r requirements.txt
-      && cp -r src/* /tmp/lambda/
-      && cd /tmp/lambda
-      && zip -r /opt/code/package.zip ."
+      bash -c "pip install --target ./tmp -r requirements.txt
+      && cp -r src/* ./tmp/"

@@ -1,0 +1,140 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: A Firehose to sink data from kinesis to S3
+
+Parameters:
+  BucketName:
+    Description: Bucket to sink data
+    Type: String
+  DataStreamName:
+    Description: Data stream name to read from
+    Type: String
+    MaxLength: 64
+
+Resources:
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/kinesisfirehose/${AWS::StackName}
+      RetentionInDays: 7
+
+  LogStream:
+    Type: AWS::Logs::LogStream
+    Properties:
+      LogGroupName: !Ref LogGroup
+      LogStreamName: snowplow-enriched-to-s3
+
+  FirehoseLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: FirehoseLambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:PutLogEvents
+                  - logs:CreateLogStream
+                  - logs:CreateLogGroup
+                  - cloudwatch:PutMetricData
+                Resource: '*'
+
+  FirehoseLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: /opt/code/tmp
+      Description: Transform snowplow tsv to json
+      Handler: snowplow_tsv_to_json/main.lambda_handler
+      Role: !GetAtt FirehoseLambdaRole.Arn
+      Runtime: python3.9
+      MemorySize: 128
+      Timeout: 60
+
+  FirehoseRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: firehose.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: FirehoseS3WritePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - kinesis:DescribeStream
+                  - kinesis:GetShardIterator
+                  - kinesis:GetRecords
+                  - kinesis:ListShards
+                Resource:
+                  - !Sub arn:aws:kinesis:${AWS::Region}:${AWS::AccountId}:stream/${DataStreamName}
+              - Effect: Allow
+                Action:
+                  - s3:AbortMultipartUpload
+                  - s3:GetBucketLocation
+                  - s3:GetObject
+                  - s3:ListBucket
+                  - s3:ListBucketMultipartUploads
+                  - s3:PutObject
+                Resource:
+                  - !Sub arn:aws:s3:::${BucketName}
+                  - !Sub arn:aws:s3:::${BucketName}/enriched-good
+                  - !Sub arn:aws:s3:::${BucketName}/enriched-good/*
+              - Effect: Allow
+                Action:
+                  - logs:PutLogEvents
+                Resource:
+                  - !GetAtt LogGroup.Arn
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                  - lambda:GetFunctionConfiguration
+                Resource: !GetAtt FirehoseLambda.Arn
+
+  FirehoseStream:
+    Type: AWS::KinesisFirehose::DeliveryStream
+    Properties:
+      DeliveryStreamType: KinesisStreamAsSource
+      ExtendedS3DestinationConfiguration:
+        BucketARN: !Sub arn:aws:s3:::${BucketName}
+        BufferingHints:
+          IntervalInSeconds: 60
+          SizeInMBs: 128
+        CloudWatchLoggingOptions:
+          Enabled: True
+          LogGroupName: !Ref LogGroup
+          LogStreamName: !Ref LogStream
+        CompressionFormat: GZIP
+        Prefix: enriched-good/
+        RoleARN: !GetAtt FirehoseRole.Arn
+        ProcessingConfiguration:
+          Enabled: True
+          Processors:
+            - Parameters:
+                - ParameterName: BufferIntervalInSeconds
+                  ParameterValue: 300
+                - ParameterName: BufferSizeInMBs
+                  ParameterValue: 3
+                - ParameterName: LambdaArn
+                  ParameterValue: !GetAtt FirehoseLambda.Arn
+                - ParameterName: NumberOfRetries
+                  ParameterValue: 1
+              Type: Lambda
+      KinesisStreamSourceConfiguration:
+        KinesisStreamARN: !Sub arn:aws:kinesis:${AWS::Region}:${AWS::AccountId}:stream/${DataStreamName}
+        RoleARN: !GetAtt FirehoseRole.Arn

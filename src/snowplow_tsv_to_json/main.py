@@ -6,7 +6,7 @@ from snowplow_analytics_sdk import event_transformer
 def transform(data: str) -> str:
     tsv_record = base64.b64decode(data).decode('utf-8')
     dict_record = event_transformer.transform(tsv_record)
-    return base64.b64encode(str.encode(f"{json.dumps(dict_record)}\n"))
+    return base64.b64encode(str.encode(f"{json.dumps(dict_record)}\n")).decode('utf-8')
 
 def lambda_handler(event, context):
     print(json.dumps(event))
