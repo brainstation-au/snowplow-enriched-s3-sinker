@@ -113,7 +113,7 @@ Resources:
       ExtendedS3DestinationConfiguration:
         BucketARN: !Sub arn:aws:s3:::${BucketName}
         BufferingHints:
-          IntervalInSeconds: 60
+          IntervalInSeconds: 900
           SizeInMBs: 128
         CloudWatchLoggingOptions:
           Enabled: True
