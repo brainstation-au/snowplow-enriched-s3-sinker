@@ -9,9 +9,19 @@ def transform(data: str) -> str:
     return base64.b64encode(str.encode(f"{json.dumps(dict_record)}\n")).decode('utf-8')
 
 def lambda_handler(event, context):
-    print(json.dumps(event))
-    output = [dict(
-        recordId=r.get('recordId'),
-        data=transform(r.get('data')),
-        result='Ok') for r in event.get('records')]
+    output = []
+    for record in event.get('records', []):
+        try:
+            data = transform(record.get('data'))
+            output.append(dict(
+                recordId=record.get('recordId'),
+                data=data,
+                result='Ok'
+            ))
+        except:
+            output.append(dict(
+                recordId=record.get('recordId'),
+                data=record.get('data'),
+                result='ProcessingFailed'
+            ))
     return dict(records=output)
