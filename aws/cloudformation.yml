@@ -121,6 +121,7 @@ Resources:
           LogStreamName: !Ref LogStream
         CompressionFormat: GZIP
         Prefix: enriched-good/
+        ErrorOutputPrefix: enriched-good-transformation-failed/
         RoleARN: !GetAtt FirehoseRole.Arn
         ProcessingConfiguration:
           Enabled: True
