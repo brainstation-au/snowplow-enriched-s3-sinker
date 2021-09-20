@@ -20,9 +20,9 @@ export DataStreamName="snowplow-enriched-good-local"
 Make sure your terminal has necessary AWS Authentication setup through either of the followings;
 1. AWS CLI credentials are stored in `$HOME/.aws/credentials` file. If you use a profile, your terminal has `AWS_PROFILE` variable with your profile name (e.g. `export AWS_PROFILE=<profile-name>`).
 1. AWS credentials are available in your terminal as following variables:
-  - AWS_ACCESS_KEY_ID
-  - AWS_SECRET_ACCESS_KEY
-  - AWS_SECURITY_TOKEN (optional)
-  - AWS_SESSION_TOKEN (optional)
+    - AWS_ACCESS_KEY_ID
+    - AWS_SECRET_ACCESS_KEY
+    - AWS_SECURITY_TOKEN (optional)
+    - AWS_SESSION_TOKEN (optional)
 
 **Important:** The default deployment region for this project is `ap-southeast-2`. To change that, navigate to `aws/docker-compose.yml` in this project.
