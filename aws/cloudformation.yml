@@ -95,6 +95,7 @@ Resources:
                   - !Sub arn:aws:s3:::${BucketName}
                   - !Sub arn:aws:s3:::${BucketName}/enriched-good
                   - !Sub arn:aws:s3:::${BucketName}/enriched-good/*
+                  - !Sub arn:aws:s3:::${BucketName}/enriched-good-transformation-failed/*
               - Effect: Allow
                 Action:
                   - logs:PutLogEvents
