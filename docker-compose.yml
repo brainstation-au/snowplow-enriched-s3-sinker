@@ -13,6 +13,10 @@ services:
     <<: *base
     command: bash -c "pip install -e . && pytest"
 
+  lint:
+    <<: *base
+    command: bash -c "pip install -e . && pylint -j 2 src tests"
+
   picked:
     <<: *base
     command: bash -c "pip install -e . && pytest --picked"

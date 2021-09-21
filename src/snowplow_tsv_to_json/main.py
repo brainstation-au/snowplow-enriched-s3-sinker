@@ -8,7 +8,10 @@ def transform(data: str) -> str:
     dict_record = event_transformer.transform(tsv_record)
     return base64.b64encode(str.encode(f"{json.dumps(dict_record)}\n")).decode('utf-8')
 
-def lambda_handler(event, context):
+def lambda_handler(
+        event,
+        context, # pylint: disable=unused-argument
+    ):
     output = []
     for record in event.get('records', []):
         try:
@@ -18,7 +21,7 @@ def lambda_handler(event, context):
                 data=data,
                 result='Ok'
             ))
-        except:
+        except: # pylint: disable=bare-except
             output.append(dict(
                 recordId=record.get('recordId'),
                 data=record.get('data'),
