@@ -2,9 +2,9 @@
 
 ### Introduction
 
-This project gives your a Kinesis Firehose that consumes Snowplow Enriched events from a Kinesis Data Stream and drops them in your nominated S3 bucket.
+This project gives your a **Kinesis Firehose** that consumes **Snowplow Enriched events** from a **Kinesis Data Stream** and drops them in your nominated **S3 bucket**.
 
-Kinesis Firehose has the ability to transform records using a lambda function. This project also deploys a lambda function Kinesis Firehose, that can transform Snowplow enriched events to JSON.
+Kinesis Firehose has the ability to transform records using a lambda function. This project also deploys a lambda function, that can transform Snowplow enriched events to JSON.
 
 Kinesis Firehose has the ability to aggregate records for upto 15 minutes or until the data volume reaches to a threshold of 128 MB. This project uses maximum threshold for both time and volume. It also GZIPs the data before they are delivered to S3.
 
